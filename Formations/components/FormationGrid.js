@@ -5,9 +5,14 @@ export default function FormationGrid({ rows = 10, cols = 10 }) {
   const [dots, setDots] = useState([]);
 
   const handleCellClick = (rowIndex, colIndex) => {
+    // Prevent dots from being placed on the last row or column
+    if (rowIndex === rows - 1 || colIndex === cols - 1) {
+      return;
+    }
+
     // Create a unique key for each dot
     const dotKey = `${rowIndex}-${colIndex}`;
-    
+
     // Toggle dot presence
     setDots(prevDots => {
       if (prevDots.includes(dotKey)) {
@@ -81,27 +86,28 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     flexDirection: 'column',
-    marginLeft: 30, // Slightly offset to the right
-    marginTop: 30, // Slightly offset downwards
+    marginLeft: 15, // Slightly offset to the right
+    marginTop: 15, // Slightly offset downwards
   },
   row: {
     flexDirection: 'row',
   },
   gridItem: {
-    width: 60,
-    height: 60,
+    width: 30,
+    height: 30,
     borderWidth: 1,
     borderColor: '#000', // Change this to dark color for visibility
     alignItems: 'center',
     justifyContent: 'center',
   },
   gridItemOverlay: {
-    width: 60,
-    height: 60,
+    width: 30,
+    height: 30,
     borderWidth: 1,
-    borderColor: '#a1f0d8', // Visible grid
+    borderColor: '#fff', // Visible grid
     alignItems: 'center',
     justifyContent: 'center',
+
   },
   dot: {
     width: 10,

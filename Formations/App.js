@@ -6,7 +6,7 @@ import FormationGrid from './components/FormationGrid';
 export default function App() {
   return (
     <View style={styles.container}>
-      <FormationGrid rows={10} cols={10} />
+      <FormationGrid />
     </View>
   );
 }
