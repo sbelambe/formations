@@ -1,25 +1,22 @@
+// FormationGrid.js
 import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import FormationDot from './FormationDot';
 
 export default function FormationGrid({ rows = 10, cols = 10 }) {
   const [dots, setDots] = useState([]);
 
   const handleCellClick = (rowIndex, colIndex) => {
-    // Prevent dots from being placed on the last row or column
     if (rowIndex === rows - 1 || colIndex === cols - 1) {
       return;
     }
 
-    // Create a unique key for each dot
     const dotKey = `${rowIndex}-${colIndex}`;
 
-    // Toggle dot presence
     setDots(prevDots => {
       if (prevDots.includes(dotKey)) {
-        // If the dot exists, remove it
         return prevDots.filter(dot => dot !== dotKey);
       } else {
-        // If the dot doesn't exist, add it
         return [...prevDots, dotKey];
       }
     });
@@ -32,24 +29,20 @@ export default function FormationGrid({ rows = 10, cols = 10 }) {
 
   return (
     <View style={styles.gridContainer}>
-      {/* Original Grid - Visible for testing */}
       <View style={styles.gridOverlay}>
         {[...Array(rows)].map((_, rowIndex) => (
           <View key={rowIndex} style={styles.row}>
             {[...Array(cols)].map((_, colIndex) => (
               <TouchableOpacity
                 key={colIndex}
-                style={styles.gridItem} // Change the border color for visibility
+                style={styles.gridItem}
                 onPress={() => handleCellClick(rowIndex, colIndex)}
-              >
-                {/* This grid is visible for testing */}
-              </TouchableOpacity>
+              />
             ))}
           </View>
         ))}
       </View>
 
-      {/* Overlay Grid - Slightly Offset */}
       <View style={styles.gridOverlayOffset}>
         {[...Array(rows)].map((_, rowIndex) => (
           <View key={rowIndex} style={styles.row}>
@@ -59,9 +52,7 @@ export default function FormationGrid({ rows = 10, cols = 10 }) {
                 style={styles.gridItemOverlay}
                 onPress={() => handleCellClick(rowIndex, colIndex)}
               >
-                {isDotPresent(rowIndex, colIndex) && (
-                  <View style={styles.dot} />
-                )}
+                {isDotPresent(rowIndex, colIndex) && <FormationDot />}
               </TouchableOpacity>
             ))}
           </View>
@@ -76,18 +67,18 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative', // Allow absolute positioning within this container
+    position: 'relative',
   },
   gridOverlay: {
     flexDirection: 'column',
   },
   gridOverlayOffset: {
-    position: 'absolute', // Position it over the grid
+    position: 'absolute',
     top: 0,
     left: 0,
     flexDirection: 'column',
-    marginLeft: 15, // Slightly offset to the right
-    marginTop: 15, // Slightly offset downwards
+    marginLeft: 15,
+    marginTop: 15,
   },
   row: {
     flexDirection: 'row',
@@ -96,7 +87,7 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderWidth: 1,
-    borderColor: '#000', // Change this to dark color for visibility
+    borderColor: '#000',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -104,15 +95,8 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderWidth: 1,
-    borderColor: '#fff', // Visible grid
+    borderColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-
-  },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#000',
   },
 });
