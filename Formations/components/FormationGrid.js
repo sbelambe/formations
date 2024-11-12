@@ -1,4 +1,3 @@
-// FormationGrid.js
 import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import FormationDot from './FormationDot';
@@ -66,19 +65,19 @@ const styles = StyleSheet.create({
   gridContainer: {
     flexDirection: 'column',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center', 
     position: 'relative',
+    flex: 1,
   },
   gridOverlay: {
+    position: 'absolute', 
     flexDirection: 'column',
   },
   gridOverlayOffset: {
     position: 'absolute',
-    top: 0,
-    left: 0,
     flexDirection: 'column',
-    marginLeft: 15,
-    marginTop: 15,
+    marginLeft: 30,
+    marginTop: 30,
   },
   row: {
     flexDirection: 'row',
@@ -87,7 +86,7 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderWidth: 1,
-    borderColor: '#000',
+    borderColor: '#03fcdb',
     alignItems: 'center',
     justifyContent: 'center',
   },
