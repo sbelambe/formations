@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, TextInput, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import FormationDot from './FormationDot';
 
-export default function FormationGrid({ rows = 10, cols = 10 }) {
+export default function FormationGrid() {
   const [dots, setDots] = useState([]);
+  const [rows, setRows] = useState(10);
+  const [cols, setCols] = useState(10); 
 
   const handleCellClick = (rowIndex, colIndex) => {
     if (rowIndex === rows - 1 || colIndex === cols - 1) {
@@ -27,47 +29,84 @@ export default function FormationGrid({ rows = 10, cols = 10 }) {
   };
 
   return (
-    <View style={styles.gridContainer}>
-      <View style={styles.gridOverlay}>
-        {[...Array(rows)].map((_, rowIndex) => (
-          <View key={rowIndex} style={styles.row}>
-            {[...Array(cols)].map((_, colIndex) => (
-              <TouchableOpacity
-                key={colIndex}
-                style={styles.gridItem}
-                onPress={() => handleCellClick(rowIndex, colIndex)}
-              />
-            ))}
-          </View>
-        ))}
+    <View style={styles.container}>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Rows:</Text>
+        <TextInput
+          style={styles.input}
+          keyboardType="numeric"
+          value={String(rows)}
+          onChangeText={(text) => setRows(Number(text))}
+        />
+        <Text style={styles.label}>Columns:</Text>
+        <TextInput
+          style={styles.input}
+          keyboardType="numeric"
+          value={String(cols)}
+          onChangeText={(text) => setCols(Number(text))}
+        />
       </View>
 
-      <View style={styles.gridOverlayOffset}>
-        {[...Array(rows)].map((_, rowIndex) => (
-          <View key={rowIndex} style={styles.row}>
-            {[...Array(cols)].map((_, colIndex) => (
-              <TouchableOpacity
-                key={colIndex}
-                style={styles.gridItemOverlay}
-                onPress={() => handleCellClick(rowIndex, colIndex)}
-              >
-                {isDotPresent(rowIndex, colIndex) && <FormationDot />}
-              </TouchableOpacity>
-            ))}
-          </View>
-        ))}
+      <View style={styles.gridContainer}>
+        <View style={styles.gridOverlay}>
+          {[...Array(rows)].map((_, rowIndex) => (
+            <View key={rowIndex} style={styles.row}>
+              {[...Array(cols)].map((_, colIndex) => (
+                <TouchableOpacity
+                  key={colIndex}
+                  style={styles.gridItem}
+                  onPress={() => handleCellClick(rowIndex, colIndex)}
+                />
+              ))}
+            </View>
+          ))}
+        </View>
+
+        <View style={styles.gridOverlayOffset}>
+          {[...Array(rows)].map((_, rowIndex) => (
+            <View key={rowIndex} style={styles.row}>
+              {[...Array(cols)].map((_, colIndex) => (
+                <TouchableOpacity
+                  key={colIndex}
+                  style={styles.gridItemOverlay}
+                  onPress={() => handleCellClick(rowIndex, colIndex)}
+                >
+                  {isDotPresent(rowIndex, colIndex) && <FormationDot />}
+                </TouchableOpacity>
+              ))}
+            </View>
+          ))}
+        </View>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  gridContainer: {
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center', 
-    position: 'relative',
+  container: {
     flex: 1,
+    // justifyContent: 'center',
+    // alignItems: 'center',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 16,
+    marginHorizontal: 5,
+  },
+  input: {
+    width: 50,
+    height: 30,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 5,
+    textAlign: 'center',
+  },
+  gridContainer: {
+    position: 'relative',
   },
   gridOverlay: {
     position: 'absolute', 
@@ -76,8 +115,8 @@ const styles = StyleSheet.create({
   gridOverlayOffset: {
     position: 'absolute',
     flexDirection: 'column',
-    marginLeft: 30,
-    marginTop: 30,
+    marginLeft: 15, 
+    marginTop: 15,  
   },
   row: {
     flexDirection: 'row',
