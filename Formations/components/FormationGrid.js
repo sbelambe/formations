@@ -1,11 +1,23 @@
-import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity, Text } from 'react-native';
-import FormationDot from './FormationDot';
+import React, { useState } from "react";
+import {
+  View,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  Button,
+} from "react-native";
+import FormationDot from "./FormationDot";
+import useSavedFormations from "../hooks/useSavedFormations"; // Import the custom hook
 
 export default function FormationGrid() {
   const [dots, setDots] = useState([]);
   const [rows, setRows] = useState(10);
-  const [cols, setCols] = useState(10); 
+  const [cols, setCols] = useState(10);
+  const [formationName, setFormationName] = useState(""); // Name input for the formation
+
+  // Use the custom hook to manage saved formations
+  const { savedFormations, saveFormation } = useSavedFormations();
 
   const handleCellClick = (rowIndex, colIndex) => {
     if (rowIndex === rows - 1 || colIndex === cols - 1) {
@@ -14,9 +26,9 @@ export default function FormationGrid() {
 
     const dotKey = `${rowIndex}-${colIndex}`;
 
-    setDots(prevDots => {
+    setDots((prevDots) => {
       if (prevDots.includes(dotKey)) {
-        return prevDots.filter(dot => dot !== dotKey);
+        return prevDots.filter((dot) => dot !== dotKey);
       } else {
         return [...prevDots, dotKey];
       }
@@ -26,6 +38,15 @@ export default function FormationGrid() {
   const isDotPresent = (rowIndex, colIndex) => {
     const dotKey = `${rowIndex}-${colIndex}`;
     return dots.includes(dotKey);
+  };
+
+  const handleSaveFormation = () => {
+    if (formationName.trim() === "") {
+      alert("Please enter a name for the formation.");
+      return;
+    }
+    saveFormation(formationName, dots);
+    setFormationName(""); // Clear the input field
   };
 
   return (
@@ -78,6 +99,31 @@ export default function FormationGrid() {
           ))}
         </View>
       </View>
+
+      <View style={{ flexDirection: "row", marginTop: 400, marginLeft: 300 }}>
+        <TextInput
+          style={[styles.input, { width: 200, marginRight: 10 }]} // Set a fixed width for the text input
+          placeholder="Enter Formation Name"
+          value={formationName}
+          onChangeText={(text) => setFormationName(text)}
+        />
+        <View style={{ justifyContent: "center" }}>
+          <Button title="Save Formation" onPress={handleSaveFormation} />
+        </View>
+      </View>
+
+      <View style={styles.savedFormationsContainer}>
+        <Text>Saved Formations:</Text>
+        {savedFormations.map(({ key, value }) => (
+          <Button
+            key={key}
+            title={key.replace("formation-", "")}
+            onPress={() => {
+              setDots(value); // Load the saved formation when a button is pressed
+            }}
+          />
+        ))}
+      </View>
     </View>
   );
 }
@@ -85,12 +131,10 @@ export default function FormationGrid() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // justifyContent: 'center',
-    // alignItems: 'center',
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 20,
   },
   label: {
@@ -101,40 +145,44 @@ const styles = StyleSheet.create({
     width: 50,
     height: 30,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     padding: 5,
-    textAlign: 'center',
+    textAlign: "center",
+    marginBottom: 10,
   },
   gridContainer: {
-    position: 'relative',
+    position: "relative",
   },
   gridOverlay: {
-    position: 'absolute', 
-    flexDirection: 'column',
+    position: "absolute",
+    flexDirection: "column",
   },
   gridOverlayOffset: {
-    position: 'absolute',
-    flexDirection: 'column',
-    marginLeft: 15, 
-    marginTop: 15,  
+    position: "absolute",
+    flexDirection: "column",
+    marginLeft: 15,
+    marginTop: 15,
   },
   row: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   gridItem: {
     width: 30,
     height: 30,
     borderWidth: 1,
-    borderColor: '#03fcdb',
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderColor: "#03fcdb",
+    alignItems: "center",
+    justifyContent: "center",
   },
   gridItemOverlay: {
     width: 30,
     height: 30,
     borderWidth: 1,
-    borderColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  savedFormationsContainer: {
+    marginTop: 20,
   },
 });
