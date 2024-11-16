@@ -1,11 +1,12 @@
-// components/HomeScreen.js
 import React from "react";
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, Button } from "react-native";
 
 function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      <Text onPress={() => navigation.navigate('Formation')}>Go to Formation Grid</Text>
+      <Text>Welcome to the Formations App</Text>
+      <Button title="Go to Formation Grid" onPress={() => navigation.navigate('Formation')} />
+      <Button title="Go to Music Splitter" onPress={() => navigation.navigate('MusicSplitter')} />
     </View>
   );
 }
