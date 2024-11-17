@@ -13,7 +13,7 @@ export default function App() {
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Formation" component={FormationGrid} />
-        <Stack.Screen name="MusicSplitter" component={MusicSplitter} /> {/* Add MusicSplitter */}
+        <Stack.Screen name="MusicSplitter" component={MusicSplitter} />
       </Stack.Navigator>
     </NavigationContainer>
   );
