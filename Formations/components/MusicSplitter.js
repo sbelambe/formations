@@ -1,18 +1,26 @@
-import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, Button, StyleSheet, Alert } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
+import { Audio } from 'expo-av';
 import Slider from '@react-native-community/slider';
 
 export default function MusicSplitter() {
   const [file, setFile] = useState(null);
+  const [audioUri, setAudioUri] = useState(null);
+  const [playbackObject, setPlaybackObject] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [duration, setDuration] = useState(0);
+  const [position, setPosition] = useState(0);
   const [breaks, setBreaks] = useState([]);
-  const [currentBreak, setCurrentBreak] = useState(0);
+  const sliderRef = useRef(null);
 
   const pickFile = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({ type: 'audio/*' });
       if (result.type === 'success') {
         setFile(result);
+        setAudioUri(result.uri);
+        loadAudio(result.uri);
       } else {
         Alert.alert("File selection cancelled.");
       }
@@ -22,24 +30,54 @@ export default function MusicSplitter() {
     }
   };
 
-  const addBreak = () => {
-    if (!file) {
-      Alert.alert("No file loaded", "Please upload an audio file before adding breaks.");
-      return;
+  const loadAudio = async (uri) => {
+    try {
+      if (playbackObject) {
+        await playbackObject.unloadAsync();
+      }
+
+      const playback = new Audio.Sound();
+      await playback.loadAsync({ uri });
+      playback.setOnPlaybackStatusUpdate(updateStatus);
+
+      const status = await playback.getStatusAsync();
+      setDuration(status.durationMillis || 0);
+      setPlaybackObject(playback);
+    } catch (error) {
+      console.error("Error loading audio:", error);
+      Alert.alert("Error loading audio. Please try again.");
     }
-    setBreaks((prevBreaks) => [...prevBreaks, currentBreak].sort((a, b) => a - b));
   };
 
-  const displayBreaks = () => {
-    if (breaks.length === 0) {
-      return <Text style={styles.noBreaks}>No breaks added yet. Use the slider to add breaks.</Text>;
+  const updateStatus = (status) => {
+    if (status.isLoaded) {
+      setPosition(status.positionMillis || 0);
+      if (status.didJustFinish) {
+        setIsPlaying(false);
+      }
     }
+  };
 
-    return breaks.map((breakPoint, index) => (
-      <Text key={index} style={styles.breakPoint}>
-        Break at {breakPoint}%
-      </Text>
-    ));
+  const togglePlayPause = async () => {
+    if (!playbackObject) return;
+
+    if (isPlaying) {
+      await playbackObject.pauseAsync();
+    } else {
+      await playbackObject.playAsync();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const addBreak = () => {
+    if (position && position > 0) {
+      const breakPoint = Math.round((position / duration) * 100);
+      setBreaks((prevBreaks) => [...prevBreaks, breakPoint].sort((a, b) => a - b));
+    }
+  };
+
+  const saveBreaks = () => {
+    Alert.alert("Breaks Saved", `Breaks saved for ${file?.name}: ${breaks.join(", ")}%`);
   };
 
   return (
@@ -49,27 +87,41 @@ export default function MusicSplitter() {
       <Button title="Choose Audio File" onPress={pickFile} />
       {file && <Text style={styles.fileName}>Loaded file: {file.name}</Text>}
 
-      {file && (
+      {audioUri && (
         <>
           <Slider
             style={{ width: '90%', height: 40, marginVertical: 10 }}
             minimumValue={0}
-            maximumValue={100}
-            step={1}
+            maximumValue={duration}
+            value={position}
             minimumTrackTintColor="#1fb28a"
             maximumTrackTintColor="#d3d3d3"
             thumbTintColor="#b9e4c9"
-            onValueChange={(value) => setCurrentBreak(value)}
+            onSlidingComplete={async (value) => {
+              if (playbackObject) {
+                await playbackObject.setPositionAsync(value);
+              }
+            }}
           />
-          <Text style={styles.breakLabel}>Current Break: {currentBreak}%</Text>
-          <Button title="Add Break" onPress={addBreak} />
+          <Text style={styles.breakLabel}>
+            Current Position: {Math.round((position / duration) * 100)}%
+          </Text>
+          <View style={styles.controls}>
+            <Button title={isPlaying ? "Pause" : "Play"} onPress={togglePlayPause} />
+            <Button title="Add Break" onPress={addBreak} />
+          </View>
         </>
       )}
 
-      {file && (
+      {breaks.length > 0 && (
         <View style={styles.breaksContainer}>
           <Text style={styles.breaksTitle}>Breaks:</Text>
-          {displayBreaks()}
+          {breaks.map((breakPoint, index) => (
+            <Text key={index} style={styles.breakPoint}>
+              Break at {breakPoint}%
+            </Text>
+          ))}
+          <Button title="Save Breaks" onPress={saveBreaks} />
         </View>
       )}
     </View>
@@ -99,6 +151,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '500',
   },
+  controls: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '80%',
+    marginVertical: 10,
+  },
   breaksContainer: {
     marginTop: 20,
     alignItems: 'center',
@@ -106,10 +164,6 @@ const styles = StyleSheet.create({
   breaksTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-  },
-  noBreaks: {
-    fontSize: 16,
-    color: '#999',
   },
   breakPoint: {
     fontSize: 16,
