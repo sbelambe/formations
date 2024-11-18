@@ -1,8 +1,8 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, Button, StyleSheet, Alert } from 'react-native';
-import * as DocumentPicker from 'expo-document-picker';
-import { Audio } from 'expo-av';
-import Slider from '@react-native-community/slider';
+import React, { useState, useRef } from "react";
+import { View, Text, Button, StyleSheet, Alert } from "react-native";
+import * as DocumentPicker from "expo-document-picker";
+import { Audio } from "expo-av";
+import Slider from "@react-native-community/slider";
 
 export default function MusicSplitter() {
   const [file, setFile] = useState(null);
@@ -16,8 +16,8 @@ export default function MusicSplitter() {
 
   const pickFile = async () => {
     try {
-      const result = await DocumentPicker.getDocumentAsync({ type: 'audio/*' });
-      if (result.type === 'success') {
+      const result = await DocumentPicker.getDocumentAsync({ type: "audio/*" });
+      if (result.type === "success") {
         setFile(result);
         setAudioUri(result.uri);
         loadAudio(result.uri);
@@ -72,12 +72,17 @@ export default function MusicSplitter() {
   const addBreak = () => {
     if (position && position > 0) {
       const breakPoint = Math.round((position / duration) * 100);
-      setBreaks((prevBreaks) => [...prevBreaks, breakPoint].sort((a, b) => a - b));
+      setBreaks((prevBreaks) =>
+        [...prevBreaks, breakPoint].sort((a, b) => a - b)
+      );
     }
   };
 
   const saveBreaks = () => {
-    Alert.alert("Breaks Saved", `Breaks saved for ${file?.name}: ${breaks.join(", ")}%`);
+    Alert.alert(
+      "Breaks Saved",
+      `Breaks saved for ${file?.name}: ${breaks.join(", ")}%`
+    );
   };
 
   return (
@@ -85,12 +90,16 @@ export default function MusicSplitter() {
       <Text style={styles.title}>Music Splitter</Text>
 
       <Button title="Choose Audio File" onPress={pickFile} />
-      {file && <Text style={styles.fileName}>Loaded file: {file.name}</Text>}
+      {file ? (
+        <Text style={styles.fileName}>Loaded file: {file.name}</Text>
+      ) : (
+        <Text style={styles.fileName}>No file loaded</Text>
+      )}
 
       {audioUri && (
         <>
           <Slider
-            style={{ width: '90%', height: 40, marginVertical: 10 }}
+            style={{ width: "90%", height: 40, marginVertical: 10 }}
             minimumValue={0}
             maximumValue={duration}
             value={position}
@@ -107,7 +116,10 @@ export default function MusicSplitter() {
             Current Position: {Math.round((position / duration) * 100)}%
           </Text>
           <View style={styles.controls}>
-            <Button title={isPlaying ? "Pause" : "Play"} onPress={togglePlayPause} />
+            <Button
+              title={isPlaying ? "Pause" : "Play"}
+              onPress={togglePlayPause}
+            />
             <Button title="Add Break" onPress={addBreak} />
           </View>
         </>
@@ -131,39 +143,39 @@ export default function MusicSplitter() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     padding: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
   },
   fileName: {
     marginTop: 10,
     fontSize: 16,
-    color: '#333',
+    color: "#333",
   },
   breakLabel: {
     marginTop: 10,
     fontSize: 18,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   controls: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '80%',
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "80%",
     marginVertical: 10,
   },
   breaksContainer: {
     marginTop: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   breaksTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   breakPoint: {
     fontSize: 16,
