@@ -67,8 +67,7 @@ export default function FormationGrid() {
           onChangeText={(text) => setCols(Number(text))}
         />
       </View>
-
-      <View style={styles.gridContainer}>
+     
         <View style={styles.gridOverlay}>
           {[...Array(rows)].map((_, rowIndex) => (
             <View key={rowIndex} style={styles.row}>
@@ -98,9 +97,9 @@ export default function FormationGrid() {
             </View>
           ))}
         </View>
-      </View>
+  
 
-      <View style={{ flexDirection: "row", marginTop: 400, marginLeft: 300 }}>
+      <View style={styles.saveFormationContainer}>
         <TextInput
           style={[styles.input, { width: 200, marginRight: 10 }]} // Set a fixed width for the text input
           placeholder="Enter Formation Name"
@@ -135,7 +134,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
+    justifyContent: "center",
   },
   label: {
     fontSize: 16,
@@ -150,18 +149,17 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 10,
   },
-  gridContainer: {
-    position: "relative",
-  },
   gridOverlay: {
     position: "absolute",
     flexDirection: "column",
+    marginTop: 50,
+    marginLeft: 30,
   },
   gridOverlayOffset: {
     position: "absolute",
     flexDirection: "column",
-    marginLeft: 15,
-    marginTop: 15,
+    marginLeft: 45,
+    marginTop: 65,
   },
   row: {
     flexDirection: "row",
@@ -182,7 +180,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  saveFormationContainer: {
+    flexDirection: "row",
+    marginTop: 20,
+    justifyContent: "center", // Center horizontally
+    alignItems: "center", // Align vertically
+    marginTop: 400,
+  },
   savedFormationsContainer: {
     marginTop: 20,
+    justifyContent: "center",
   },
 });
