@@ -15,9 +15,11 @@ export default function FormationGrid() {
   const [dots, setDots] = useState([]);
   const [rows, setRows] = useState(10);
   const [cols, setCols] = useState(10);
-  const [formationName, setFormationName] = useState(""); 
+  const [formationName, setFormationName] = useState("");
+  const [selectedFormation, setSelectedFormation] = useState(null);
 
-  const { savedFormations, saveFormation } = useSavedFormations();
+  const { savedFormations, saveFormation, deleteFormation } =
+    useSavedFormations();
 
   const handleCellClick = (rowIndex, colIndex) => {
     if (rowIndex === rows - 1 || colIndex === cols - 1) {
@@ -47,6 +49,13 @@ export default function FormationGrid() {
     }
     saveFormation(formationName, dots);
     setFormationName("");
+  };
+
+  const handleDeleteFormation = () => {
+    if (selectedFormation) {
+      deleteFormation(selectedFormation);
+      setSelectedFormation(null);
+    }
   };
 
   return (
@@ -92,7 +101,6 @@ export default function FormationGrid() {
             ))}
           </View>
 
-          {/* Offset and overlap the grid by positioning it absolutely */}
           <View style={styles.gridOverlayOffset}>
             {[...Array(rows)].map((_, rowIndex) => (
               <View key={rowIndex} style={styles.row}>
@@ -123,16 +131,37 @@ export default function FormationGrid() {
         </View>
 
         <View style={styles.savedFormationsContainer}>
-          <Text>Saved Formations:</Text>
-          {savedFormations.map(({ key, value }) => (
-            <Button
-              key={key}
-              title={key.replace("formation-", "")}
-              onPress={() => {
-                setDots(value);
-              }}
-            />
-          ))}
+          <Text style={styles.savedFormationsTitle}>Saved Formations:</Text>
+          {savedFormations.map(({ key, value }) => {
+            const formationName = key.replace("formation-", "");
+            return (
+              <View key={key} style={styles.savedFormationRow}>
+                <TouchableOpacity
+                  style={[
+                    styles.savedFormationButton,
+                    selectedFormation === formationName &&
+                      styles.selectedFormationButton,
+                  ]}
+                  onPress={() => {
+                    setDots(value);
+                    setSelectedFormation(formationName);
+                  }}
+                >
+                  <Text style={styles.savedFormationButtonText}>
+                    {formationName}
+                  </Text>
+                </TouchableOpacity>
+                {selectedFormation === formationName && (
+                  <TouchableOpacity
+                    style={styles.deleteButton}
+                    onPress={handleDeleteFormation}
+                  >
+                    <Text style={styles.deleteButtonText}>Delete</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            );
+          })}
         </View>
       </View>
     </ScrollView>
@@ -232,7 +261,52 @@ const styles = StyleSheet.create({
   },
   savedFormationsContainer: {
     marginTop: 20,
-    justifyContent: "center",
-    backgroundColor: "#bb2345",
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 5,
+    backgroundColor: "#f9f9f9",
+  },
+  savedFormationsTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#333",
+  },
+  savedFormationRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  savedFormationButton: {
+    backgroundColor: "#6200ea",
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  selectedFormationButton: {
+    backgroundColor: "#3700b3",
+  },
+  savedFormationButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  deleteButton: {
+    backgroundColor: "#ff1744",
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+  },
+  deleteButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
