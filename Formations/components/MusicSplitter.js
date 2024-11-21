@@ -1,184 +1,109 @@
-import React, { useState, useRef } from "react";
-import { View, Text, Button, StyleSheet, Alert } from "react-native";
-import * as DocumentPicker from "expo-document-picker";
-import { Audio } from "expo-av";
-import Slider from "@react-native-community/slider";
+import React, { useRef, useEffect, useState } from "react";
+import WaveSurfer from "wavesurfer.js";
+import RegionsPlugin from "wavesurfer.js/dist/plugins/regions.esm.js";
 
-export default function MusicSplitter() {
-  const [file, setFile] = useState(null);
-  const [audioUri, setAudioUri] = useState(null);
-  const [playbackObject, setPlaybackObject] = useState(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [duration, setDuration] = useState(0);
-  const [position, setPosition] = useState(0);
-  const [breaks, setBreaks] = useState([]);
-  const sliderRef = useRef(null);
+const MusicSplitterWithUpload = () => {
+  const waveformRef = useRef(null);
+  const wavesurfer = useRef(null);
+  const [regions, setRegions] = useState([]);
 
-  const pickFile = async () => {
-    try {
-      const result = await DocumentPicker.getDocumentAsync({ type: "audio/*" });
-      if (result.type === "success") {
-        setFile(result);
-        setAudioUri(result.uri);
-        loadAudio(result.uri);
-      } else {
-        Alert.alert("File selection cancelled.");
-      }
-    } catch (error) {
-      console.error("Error picking file:", error);
-      Alert.alert("Error picking file. Please try again.");
+  useEffect(() => {
+    // Initialize WaveSurfer with the Regions plugin
+    wavesurfer.current = WaveSurfer.create({
+      container: waveformRef.current,
+      waveColor: "#ddd",
+      progressColor: "#2196f3",
+      height: 200,
+      plugins: [
+        RegionsPlugin.create({
+          dragSelection: true, // Enable creating regions by dragging on the waveform
+        }),
+      ],
+    });
+
+    // Listen for region events
+    wavesurfer.current.on("region-created", (region) => {
+      addRegion(region);
+    });
+
+    wavesurfer.current.on("region-updated", (region) => {
+      updateRegion(region);
+    });
+
+    wavesurfer.current.on("region-removed", (region) => {
+      removeRegion(region.id);
+    });
+
+    return () => {
+      wavesurfer.current.destroy();
+    };
+  }, []);
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const objectUrl = URL.createObjectURL(file);
+      wavesurfer.current.load(objectUrl);
     }
   };
 
-  const loadAudio = async (uri) => {
-    try {
-      if (playbackObject) {
-        await playbackObject.unloadAsync();
-      }
-
-      const playback = new Audio.Sound();
-      await playback.loadAsync({ uri });
-      playback.setOnPlaybackStatusUpdate(updateStatus);
-
-      const status = await playback.getStatusAsync();
-      setDuration(status.durationMillis || 0);
-      setPlaybackObject(playback);
-    } catch (error) {
-      console.error("Error loading audio:", error);
-      Alert.alert("Error loading audio. Please try again.");
-    }
+  const addRegion = (region) => {
+    setRegions((prev) => [
+      ...prev,
+      {
+        id: region.id,
+        start: region.start,
+        end: region.end,
+        color: region.color || "rgba(0, 0, 255, 0.2)",
+      },
+    ]);
   };
 
-  const updateStatus = (status) => {
-    if (status.isLoaded) {
-      setPosition(status.positionMillis || 0);
-      if (status.didJustFinish) {
-        setIsPlaying(false);
-      }
-    }
+  const updateRegion = (region) => {
+    setRegions((prev) =>
+      prev.map((r) =>
+        r.id === region.id
+          ? { ...r, start: region.start, end: region.end }
+          : r
+      )
+    );
   };
 
-  const togglePlayPause = async () => {
-    if (!playbackObject) return;
-
-    if (isPlaying) {
-      await playbackObject.pauseAsync();
-    } else {
-      await playbackObject.playAsync();
-    }
-    setIsPlaying(!isPlaying);
+  const removeRegion = (id) => {
+    setRegions((prev) => prev.filter((region) => region.id !== id));
   };
 
-  const addBreak = () => {
-    if (position && position > 0) {
-      const breakPoint = Math.round((position / duration) * 100);
-      setBreaks((prevBreaks) =>
-        [...prevBreaks, breakPoint].sort((a, b) => a - b)
-      );
-    }
+  const handleDeleteRegion = (id) => {
+    wavesurfer.current.regions.list[id].remove();
   };
 
-  const saveBreaks = () => {
-    Alert.alert(
-      "Breaks Saved",
-      `Breaks saved for ${file?.name}: ${breaks.join(", ")}%`
+  const handleAttachLabel = (id, label) => {
+    setRegions((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, label } : r))
     );
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Music Splitter</Text>
-
-      <Button title="Choose Audio File" onPress={pickFile} />
-      {file ? (
-        <Text style={styles.fileName}>Loaded file: {file.name}</Text>
-      ) : (
-        <Text style={styles.fileName}>No file loaded</Text>
-      )}
-
-      {audioUri && (
-        <>
-          <Slider
-            style={{ width: "90%", height: 40, marginVertical: 10 }}
-            minimumValue={0}
-            maximumValue={duration}
-            value={position}
-            minimumTrackTintColor="#1fb28a"
-            maximumTrackTintColor="#d3d3d3"
-            thumbTintColor="#b9e4c9"
-            onSlidingComplete={async (value) => {
-              if (playbackObject) {
-                await playbackObject.setPositionAsync(value);
-              }
-            }}
-          />
-          <Text style={styles.breakLabel}>
-            Current Position: {Math.round((position / duration) * 100)}%
-          </Text>
-          <View style={styles.controls}>
-            <Button
-              title={isPlaying ? "Pause" : "Play"}
-              onPress={togglePlayPause}
+    <div>
+      <h1>Music Splitter</h1>
+      <p>Upload an MP3 file to get started.</p>
+      <input type="file" accept="audio/mp3" onChange={handleFileUpload} />
+      <div ref={waveformRef} style={{ width: "100%", height: "200px", margin: "20px 0" }}></div>
+      <ul>
+        {regions.map((region) => (
+          <li key={region.id}>
+            Region: {region.start.toFixed(2)}s - {region.end.toFixed(2)}s
+            <input
+              type="text"
+              placeholder="Enter label"
+              onBlur={(e) => handleAttachLabel(region.id, e.target.value)}
             />
-            <Button title="Add Break" onPress={addBreak} />
-          </View>
-        </>
-      )}
-
-      {breaks.length > 0 && (
-        <View style={styles.breaksContainer}>
-          <Text style={styles.breaksTitle}>Breaks:</Text>
-          {breaks.map((breakPoint, index) => (
-            <Text key={index} style={styles.breakPoint}>
-              Break at {breakPoint}%
-            </Text>
-          ))}
-          <Button title="Save Breaks" onPress={saveBreaks} />
-        </View>
-      )}
-    </View>
+            <button onClick={() => handleDeleteRegion(region.id)}>Delete</button>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
-    backgroundColor: "#f5f5f5",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  fileName: {
-    marginTop: 10,
-    fontSize: 16,
-    color: "#333",
-  },
-  breakLabel: {
-    marginTop: 10,
-    fontSize: 18,
-    fontWeight: "500",
-  },
-  controls: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    width: "80%",
-    marginVertical: 10,
-  },
-  breaksContainer: {
-    marginTop: 20,
-    alignItems: "center",
-  },
-  breaksTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  breakPoint: {
-    fontSize: 16,
-    marginVertical: 5,
-  },
-});
+export default MusicSplitterWithUpload;
