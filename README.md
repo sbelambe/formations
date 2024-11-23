@@ -1,6 +1,13 @@
 ### Formations
 
-This full-stack application can be used to create formations for any performance team by implementing a touchble grid where dots can be placed. The goal is to improve the choreography process by simplifying a major part of any performance routine. 
+Formations is a full-stack application designed to streamline the choreography process for performance teams. By providing an interactive, touch-responsive grid, it allows users to easily design and adjust formations for their routines. Whether you're coordinating dance moves, marching band patterns, or stage arrangements, Formations simplifies a key aspect of performance planning, saving time and enhancing creativity.
+
+## Key Features
+**Interactive Grid:** Create, edit, and reposition dots to represent team members effortlessly.
+**Customizable Layouts:** Adapt the grid to fit any performance setup or team size.
+**Collaboration-Friendly:** Share and iterate on formations with your team in real time.
+
+
 
 ## Getting Started
 Prerequisties
