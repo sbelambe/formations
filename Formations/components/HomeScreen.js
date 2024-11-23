@@ -16,7 +16,7 @@ function HomeScreen({ navigation }) {
         <Button
           title="Create New Set Formations"
           onPress={() => navigation.navigate("Formation")}
-        />
+        /> 
         <Button
           title="Go to Music Splitter"
           onPress={() => navigation.navigate("MusicSplitter")}
