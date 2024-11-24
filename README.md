@@ -7,6 +7,13 @@ Formations is a full-stack application designed to streamline the choreography p
 **Customizable Layouts:** Adapt the grid to fit any performance setup or team size.
 **Collaboration-Friendly:** Share and iterate on formations with your team in real time.
 
+## Features to be Implemented
+**User Authentication:** Implement login and registration functionality to secure user data.
+**Formation Animation:** Add the ability to animate formations to visualize transitions between different setups.
+**Export Options:** Enable users to export formations as images or PDFs for offline use.
+**Mobile Optimization:** Enhance the user interface for a seamless experience on mobile devices.
+**Performance Analytics:** Provide insights and analytics on formation efficiency and team performance.
+
 
 
 ## Getting Started
