@@ -2,10 +2,11 @@ import React, { useRef, useEffect, useState } from "react";
 import WaveSurfer from "wavesurfer.js";
 import RegionsPlugin from "wavesurfer.js/dist/plugins/regions.esm.js";
 
-const MusicSplitterWithUpload = () => {
+const MusicSplitter = () => {
   const waveformRef = useRef(null);
   const wavesurfer = useRef(null);
   const [regions, setRegions] = useState([]);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     // Initialize WaveSurfer with the Regions plugin
@@ -14,6 +15,7 @@ const MusicSplitterWithUpload = () => {
       waveColor: "#ddd",
       progressColor: "#2196f3",
       height: 200,
+      responsive: true,
       plugins: [
         RegionsPlugin.create({
           dragSelection: true, // Enable creating regions by dragging on the waveform
@@ -35,7 +37,7 @@ const MusicSplitterWithUpload = () => {
     });
 
     return () => {
-      wavesurfer.current.destroy();
+      if (wavesurfer.current) wavesurfer.current.destroy();
     };
   }, []);
 
@@ -44,6 +46,8 @@ const MusicSplitterWithUpload = () => {
     if (file) {
       const objectUrl = URL.createObjectURL(file);
       wavesurfer.current.load(objectUrl);
+    } else {
+      console.error("No file selected or unsupported format.");
     }
   };
 
@@ -74,7 +78,9 @@ const MusicSplitterWithUpload = () => {
   };
 
   const handleDeleteRegion = (id) => {
-    wavesurfer.current.regions.list[id].remove();
+    if (wavesurfer.current.regions.list[id]) {
+      wavesurfer.current.regions.list[id].remove();
+    }
   };
 
   const handleAttachLabel = (id, label) => {
@@ -83,12 +89,30 @@ const MusicSplitterWithUpload = () => {
     );
   };
 
+  const togglePlayPause = () => {
+    if (wavesurfer.current) {
+      wavesurfer.current.playPause();
+      setIsPlaying((prev) => !prev);
+    }
+  };
+
   return (
     <div>
       <h1>Music Splitter</h1>
       <p>Upload an MP3 file to get started.</p>
-      <input type="file" accept="audio/mp3" onChange={handleFileUpload} />
-      <div ref={waveformRef} style={{ width: "100%", height: "200px", margin: "20px 0" }}></div>
+      <input type="file" accept="audio/*" onChange={handleFileUpload} />
+      <div
+        ref={waveformRef}
+        style={{
+          width: "100%",
+          height: "200px",
+          margin: "20px 0",
+          backgroundColor: "#f4f4f4",
+        }}
+      ></div>
+      <button onClick={togglePlayPause}>
+        {isPlaying ? "Pause" : "Play"}
+      </button>
       <ul>
         {regions.map((region) => (
           <li key={region.id}>
@@ -106,4 +130,4 @@ const MusicSplitterWithUpload = () => {
   );
 };
 
-export default MusicSplitterWithUpload;
+export default MusicSplitter;
