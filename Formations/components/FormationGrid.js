@@ -59,7 +59,7 @@ export default function FormationGrid() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
+
       <View style={styles.container}>
         <View style={styles.inputText}>
           <Text style={styles.label}>Rows and Columns are limited to 15</Text>
@@ -164,18 +164,15 @@ export default function FormationGrid() {
           })}
         </View>
       </View>
-    </ScrollView>
+
   );
 }
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-    paddingBottom: 20,
-  },
   container: {
     display: "flex",
     flexDirection: "column",
+    // flex: 1,
   },
   inputButtons: {
     flexDirection: "row",
