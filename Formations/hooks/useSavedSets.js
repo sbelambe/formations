@@ -9,6 +9,8 @@ const useSavedSets = () => {
       const savedSetsData = await AsyncStorage.getItem("savedSets");
       if (savedSetsData) {
         setSavedSets(JSON.parse(savedSetsData));
+      } else {
+        setSavedSets([]);
       }
     } catch (error) {
       console.error("Failed to load saved sets:", error);
@@ -17,12 +19,10 @@ const useSavedSets = () => {
 
   const saveSet = async (newSet) => {
     try {
-      const savedSetsData = await AsyncStorage.getItem("savedSets");
-      let updatedSets = savedSetsData ? JSON.parse(savedSetsData) : [];
-      updatedSets.push(newSet);
+      const updatedSets = [...savedSets, newSet];
+      setSavedSets(updatedSets);
 
       await AsyncStorage.setItem("savedSets", JSON.stringify(updatedSets));
-      setSavedSets(updatedSets);
     } catch (error) {
       console.error("Failed to save set:", error);
     }
@@ -30,17 +30,18 @@ const useSavedSets = () => {
 
   const deleteSet = async (setId) => {
     try {
-      const savedSetsData = await AsyncStorage.getItem("savedSets");
-      let updatedSets = savedSetsData ? JSON.parse(savedSetsData) : [];
-
-      updatedSets = updatedSets.filter((set) => set.id !== setId);
+      const updatedSets = savedSets.filter((set) => set.id !== setId); 
+      setSavedSets(updatedSets);
 
       await AsyncStorage.setItem("savedSets", JSON.stringify(updatedSets));
-      setSavedSets(updatedSets);
     } catch (error) {
       console.error("Failed to delete set:", error);
     }
   };
+
+  useEffect(() => {
+    loadSets();
+  }, []);
 
   return { savedSets, loadSets, saveSet, deleteSet };
 };

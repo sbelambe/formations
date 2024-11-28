@@ -1,13 +1,21 @@
-import React, { useEffect } from "react";
+import React, { useCallback } from "react";
 import { View, StyleSheet, Text, Button, ScrollView } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import useSavedSets from "../hooks/useSavedSets";
 
 function HomeScreen({ navigation }) {
-  const { savedSets, loadSets } = useSavedSets();
+  const { savedSets, loadSets, deleteSet } = useSavedSets();
 
-  useEffect(() => {
-    loadSets(); 
-  }, []); 
+  // Ensure `loadSets` is called every time the screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      loadSets(); // Reload saved sets
+    }, [])
+  );
+
+  const handleDeleteSet = (setId) => {
+    deleteSet(setId); // Delete the set and update the state
+  };
 
   return (
     <View style={styles.container}>
@@ -27,15 +35,27 @@ function HomeScreen({ navigation }) {
       </View>
 
       <View style={styles.saved}>
-        <Text>Saved Sets:</Text>
+        <Text style={styles.savedTitle}>Saved Sets:</Text>
         <ScrollView>
-          {savedSets.map((set) => (
-            <Button
-              key={set.id}
-              title={set.name}
-              onPress={() => navigation.navigate("SetDetailsScreen", { setId: set.id })}
-            />
-          ))}
+          {savedSets.length > 0 ? (
+            savedSets.map((set) => (
+              <View key={set.id} style={styles.setItem}>
+                <Button
+                  title={set.name}
+                  onPress={() =>
+                    navigation.navigate("SetDetailsScreen", { setId: set.id })
+                  }
+                />
+                <Button
+                  title="Delete"
+                  color="red"
+                  onPress={() => handleDeleteSet(set.id)} // Delete the selected set
+                />
+              </View>
+            ))
+          ) : (
+            <Text style={styles.noSetsText}>No saved sets available.</Text>
+          )}
         </ScrollView>
       </View>
     </View>
@@ -45,6 +65,7 @@ function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 16,
   },
   introduction: {
     alignItems: "center",
@@ -65,6 +86,22 @@ const styles = StyleSheet.create({
   },
   saved: {
     margin: 10,
+  },
+  savedTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  setItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: 5,
+  },
+  noSetsText: {
+    fontSize: 16,
+    fontStyle: "italic",
+    textAlign: "center",
+    marginVertical: 10,
   },
 });
 
