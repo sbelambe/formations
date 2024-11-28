@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Button, ScrollView } from "react-native";
 import useSavedSets from "../hooks/useSavedSets"; 
-import FormationGrid from "./FormationGrid"; 
+import FormationGrid from "../components/FormationGrid"; 
 
 function SetDetailsScreen({ route, navigation }) {
   const { setId } = route.params;
