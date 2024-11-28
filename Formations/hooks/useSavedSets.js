@@ -19,19 +19,30 @@ const useSavedSets = () => {
     try {
       const savedSetsData = await AsyncStorage.getItem("savedSets");
       let updatedSets = savedSetsData ? JSON.parse(savedSetsData) : [];
-      
       updatedSets.push(newSet);
 
       await AsyncStorage.setItem("savedSets", JSON.stringify(updatedSets));
-
-    
       setSavedSets(updatedSets);
     } catch (error) {
       console.error("Failed to save set:", error);
     }
   };
 
-  return { savedSets, loadSets, saveSet };
+  const deleteSet = async (setId) => {
+    try {
+      const savedSetsData = await AsyncStorage.getItem("savedSets");
+      let updatedSets = savedSetsData ? JSON.parse(savedSetsData) : [];
+
+      updatedSets = updatedSets.filter((set) => set.id !== setId);
+
+      await AsyncStorage.setItem("savedSets", JSON.stringify(updatedSets));
+      setSavedSets(updatedSets);
+    } catch (error) {
+      console.error("Failed to delete set:", error);
+    }
+  };
+
+  return { savedSets, loadSets, saveSet, deleteSet };
 };
 
 export default useSavedSets;
