@@ -19,8 +19,8 @@ function SetDetailsScreen({ route, navigation }) {
   }, [savedSets, setId]);
 
   const handleDeleteSet = () => {
-    deleteSet(setId); // Call deleteSet to remove the current set
-    navigation.goBack(); // Navigate back to the previous screen
+    deleteSet(setId);
+    navigation.goBack(); 
   };
 
   if (loading) {

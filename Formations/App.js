@@ -18,20 +18,3 @@ export default function App() {
     </NavigationContainer>
   );
 }
-
-// import React from "react";
-// import { NavigationContainer } from "@react-navigation/native";
-// import { createStackNavigator } from "@react-navigation/stack";
-// import FormationGrid from "./components/FormationGrid"; // Ensure the path is correct
-
-// const Stack = createStackNavigator();
-
-// export default function App() {
-//   return (
-//     <NavigationContainer>
-//       <Stack.Navigator initialRouteName="FormationGrid">
-//         <Stack.Screen name="FormationGrid" component={FormationGrid} />
-//       </Stack.Navigator>
-//     </NavigationContainer>
-//   );
-// }

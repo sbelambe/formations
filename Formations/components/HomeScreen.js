@@ -6,15 +6,14 @@ import useSavedSets from "../hooks/useSavedSets";
 function HomeScreen({ navigation }) {
   const { savedSets, loadSets, deleteSet } = useSavedSets();
 
-  // Ensure `loadSets` is called every time the screen comes into focus
   useFocusEffect(
     useCallback(() => {
-      loadSets(); // Reload saved sets
+      loadSets(); 
     }, [])
   );
 
   const handleDeleteSet = (setId) => {
-    deleteSet(setId); // Delete the set and update the state
+    deleteSet(setId);
   };
 
   return (
@@ -49,7 +48,7 @@ function HomeScreen({ navigation }) {
                 <Button
                   title="Delete"
                   color="red"
-                  onPress={() => handleDeleteSet(set.id)} // Delete the selected set
+                  onPress={() => handleDeleteSet(set.id)}
                 />
               </View>
             ))
