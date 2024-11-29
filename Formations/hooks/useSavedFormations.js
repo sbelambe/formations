@@ -27,7 +27,7 @@ const useSavedFormations = () => {
 
     try {
       await AsyncStorage.setItem(key, JSON.stringify(formation));
-      loadSavedFormations(); // Reload formations after saving
+      loadSavedFormations(); 
     } catch (error) {
       console.error("Failed to save formation:", error);
     }
@@ -37,7 +37,7 @@ const useSavedFormations = () => {
     const key = `formation-${name}`;
     try {
       await AsyncStorage.removeItem(key);
-      loadSavedFormations(); // Reload formations after deleting
+      loadSavedFormations();
     } catch (error) {
       console.error("Failed to delete formation:", error);
     }
