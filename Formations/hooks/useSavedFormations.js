@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const useSavedFormations = () => {
+const useSavedFormations = (setId) => {
   const [savedFormations, setSavedFormations] = useState([]);
 
   const loadSavedFormations = async () => {
@@ -10,7 +10,7 @@ const useSavedFormations = () => {
       const formations = await AsyncStorage.multiGet(keys);
       setSavedFormations(
         formations
-          .filter(([key]) => key.startsWith("formation-"))
+          .filter(([key]) => key.startsWith(`formation-${setId}-`)) 
           .map(([key, value]) => ({ key, value: JSON.parse(value) }))
       );
     } catch (error) {
@@ -19,7 +19,7 @@ const useSavedFormations = () => {
   };
 
   const saveFormation = async (name, formation) => {
-    const key = `formation-${name}`;
+    const key = `formation-${setId}-${name}`; 
     if (savedFormations.some((formation) => formation.key === key)) {
       alert("A formation with this name already exists. Please use a different name.");
       return;
@@ -27,17 +27,20 @@ const useSavedFormations = () => {
 
     try {
       await AsyncStorage.setItem(key, JSON.stringify(formation));
-      loadSavedFormations(); 
+      setSavedFormations(prevFormations => [
+        ...prevFormations,
+        { key, value: formation }
+      ]); 
     } catch (error) {
       console.error("Failed to save formation:", error);
     }
   };
 
   const deleteFormation = async (name) => {
-    const key = `formation-${name}`;
+    const key = `formation-${setId}-${name}`; 
     try {
       await AsyncStorage.removeItem(key);
-      loadSavedFormations();
+      setSavedFormations(prevFormations => prevFormations.filter(f => f.key !== key)); 
     } catch (error) {
       console.error("Failed to delete formation:", error);
     }
@@ -45,7 +48,7 @@ const useSavedFormations = () => {
 
   useEffect(() => {
     loadSavedFormations();
-  }, []);
+  }, [setId]);  
 
   return { savedFormations, saveFormation, deleteFormation };
 };

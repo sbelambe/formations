@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import FormationDot from "./FormationDot";
 import useSavedFormations from "../hooks/useSavedFormations";
+import {useRoute} from '@react-navigation/native';
 
 export default function FormationGrid() {
   const [dots, setDots] = useState([]);
@@ -18,8 +19,11 @@ export default function FormationGrid() {
   const [formationName, setFormationName] = useState("");
   const [selectedFormation, setSelectedFormation] = useState(null);
 
+  const route = useRoute();
+  const {setId} = route.params;
+
   const { savedFormations, saveFormation, deleteFormation } =
-    useSavedFormations();
+    useSavedFormations(setId);
 
   const handleCellClick = (rowIndex, colIndex) => {
     if (rowIndex === rows - 1 || colIndex === cols - 1) {
@@ -62,6 +66,7 @@ export default function FormationGrid() {
 
       <View style={styles.container}>
         <View style={styles.inputText}>
+          <Text>Formation ID: {setId}</Text>
           <Text style={styles.label}>Rows and Columns are limited to 15</Text>
           <View style={styles.inputButtons}>
             <Text style={styles.label}>Rows:</Text>
@@ -133,7 +138,7 @@ export default function FormationGrid() {
         <View style={styles.savedFormationsContainer}>
           <Text style={styles.savedFormationsTitle}>Saved Formations:</Text>
           {savedFormations.map(({ key, value }) => {
-            const formationName = key.replace("formation-", "");
+            const formationName = key.replace(`formation-${setId}-`, "");
             return (
               <View key={key} style={styles.savedFormationRow}>
                 <TouchableOpacity
