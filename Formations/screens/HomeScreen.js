@@ -8,7 +8,7 @@ function HomeScreen({ navigation }) {
 
   useFocusEffect(
     useCallback(() => {
-      loadSets(); 
+      loadSets();
     }, [])
   );
 
@@ -27,6 +27,10 @@ function HomeScreen({ navigation }) {
       </View>
 
       <View style={styles.new}>
+        <Button
+          title="Open Music Splitter"
+          onPress={() => navigation.navigate("MusicSplitter")}
+        />
         <Button
           title="Create New Set Formations"
           onPress={() => navigation.navigate("CreateSetScreen")}
